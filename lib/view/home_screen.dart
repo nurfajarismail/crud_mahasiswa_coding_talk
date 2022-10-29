@@ -1,7 +1,10 @@
 import 'package:crud_mahasiswa/network/api.dart';
+import 'package:crud_mahasiswa/response/res_add_data.dart';
+import 'package:crud_mahasiswa/response/res_edit_data.dart';
 import 'package:crud_mahasiswa/response/res_get_data.dart';
 import 'package:crud_mahasiswa/view/add_screen.dart';
 import 'package:crud_mahasiswa/view/detail_screen.dart';
+import 'package:crud_mahasiswa/view/edit_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,6 +29,35 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         isLoading = false;
         listMahasiswa = data ?? [];
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              e.toString(),
+            ),
+          ),
+        );
+      });
+    }
+    return null;
+  }
+
+  Future<ResAddMahasiswa?> deleteMahasiswa(String id) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      http.Response response = await http.post(
+          Uri.parse(
+            "${baseUrl}delete_data.php",
+          ),
+          body: {"id": id});
+      ResAddMahasiswa data = resAddMahasiswaFromJson(response.body);
+      setState(() {
+        isLoading = false;
       });
     } catch (e) {
       setState(() {
@@ -73,11 +105,41 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) =>
+                                          EditScreen(listMahasiswa[index])));
+                            },
                             icon: Icon(Icons.edit),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () async {
+                              await showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  title: const Text('Konfirmasi Penghapusan'),
+                                  content: const Text(
+                                      'Apakah anda yakin ingin menghapus data ini?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('Tidak'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        await deleteMahasiswa(
+                                            listMahasiswa[index].id.toString());
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('Ya'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              getMahasiswa();
+                            },
                             icon: Icon(
                               Icons.delete,
                               color: Colors.red,

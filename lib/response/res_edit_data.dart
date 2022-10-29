@@ -1,27 +1,26 @@
 // To parse this JSON data, do
 //
-//     final resAddMahasiswa = resAddMahasiswaFromJson(jsonString);
+//     final resEditData = resEditDataFromJson(jsonString);
 
 import 'dart:convert';
 
-ResAddMahasiswa resAddMahasiswaFromJson(String str) =>
-    ResAddMahasiswa.fromJson(json.decode(str));
+ResEditData resEditDataFromJson(String str) =>
+    ResEditData.fromJson(json.decode(str));
 
-String resAddMahasiswaToJson(ResAddMahasiswa data) =>
-    json.encode(data.toJson());
+String resEditDataToJson(ResEditData data) => json.encode(data.toJson());
 
-class ResAddMahasiswa {
-  ResAddMahasiswa({
+class ResEditData {
+  ResEditData({
     this.value,
     this.message,
+
     
   });
 
   int? value;
   String? message;
 
-  factory ResAddMahasiswa.fromJson(Map<String, dynamic> json) =>
-      ResAddMahasiswa(
+  factory ResEditData.fromJson(Map<String, dynamic> json) => ResEditData(
         value: json["value"] == null ? null : json["value"],
         message: json["message"] == null ? null : json["message"],
       );
